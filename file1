@@ -1,0 +1,38 @@
+import yfinance as yf
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+df = yf.download("BTC-USD", start="2020-01-01", end="2024-12-31")
+df["Date"] = df.index
+df["WeekDay"] = df["Date"].dt.weekday
+#idk
+df.columns = df.columns.get_level_values(0)
+
+# گرفتن عدد سرمایه اولیه
+primary_capital = float(input("Enter your primary capital amount: "))
+capital = primary_capital
+btc_amount = 0
+history = []
+
+for index, loc in df.iterrows():
+# خرید در روز 2 هفته
+    if loc["WeekDay"] == 2 and btc_amount == 0:
+        btc_amount = capital / loc["Open"]
+        capital = 0
+# فروش در روز 4 هفته
+    elif loc["WeekDay"] == 4:
+        capital = btc_amount * loc["Close"]
+        btc_amount = 0
+        history.append((loc["Date"], capital))
+# سرمایه چقدر شده است؟
+current_capital = capital
+print(current_capital)
+
+# نشان دادن نمودار سرمایه
+history_df = pd.DataFrame(history, columns=["Date", "Capital"])
+plt.plot(history_df["Date"], history_df["Capital"])
+plt.show()
+
+
+# اگر چه روزی میخرید و چه روزی میفروخت سود بیشتری میکرد؟
